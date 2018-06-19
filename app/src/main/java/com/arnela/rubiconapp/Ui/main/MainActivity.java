@@ -5,7 +5,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -14,7 +13,6 @@ import com.arnela.rubiconapp.Data.DataManager;
 import com.arnela.rubiconapp.Data.DataModels.SuggestionVm;
 import com.arnela.rubiconapp.Data.DataModels.TvMovieVm;
 import com.arnela.rubiconapp.Data.Helper.ItemClickListener;
-import com.arnela.rubiconapp.Data.Helper.ListWrapper;
 import com.arnela.rubiconapp.R;
 import com.arnela.rubiconapp.Ui.detail.DetailActivity;
 import com.arnela.rubiconapp.Util.DialogFactory;
@@ -22,6 +20,8 @@ import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,13 +34,12 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Item
     MaterialSearchBar mSearchBar;
     @BindView(R.id.tabs)
     TabLayout tabLayout;
+    Timer timer;
 
     // The pager adapter, which provides the pages to the view pager widget.
     private PageAdapterHandler mPagerAdapter;
-    private DataManager dataManager;
     private MainActivityPresenter mPresenter;
     private CustomSuggestionsAdapter mCustomSuggestionsAdapter;
-    private List<SuggestionVm> mSourceTopList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +51,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Item
         mCustomSuggestionsAdapter = new CustomSuggestionsAdapter(inflater, this);
         mSearchBar.setCustomSuggestionAdapter(mCustomSuggestionsAdapter);
 
-        dataManager = new DataManager();
+        DataManager dataManager = new DataManager();
         mPresenter = new MainActivityPresenter(dataManager);
         mPresenter.attachView(this);
+        mPresenter.loadListData(mPager.getCurrentItem() == 0);
 
         mSearchBar.addTextChangeListener(this);
 
@@ -70,13 +70,22 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Item
         mPagerAdapter.addFragment(new TvShowFragment(), getResources().getString(R.string.tv_shows));
         mPager.setPageTransformer(false, mPresenter.getAnimationForFragments());
         mPager.setAdapter(mPagerAdapter);
-    }
 
-    // This method will be called from fragment when data in list view change
-    public void updateData(List<SuggestionVm> dataSet) {
+        mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
-        mSourceTopList = dataSet;
-        mCustomSuggestionsAdapter.setSuggestions(dataSet);
+            @Override
+            public void onPageSelected(int position) {
+
+                switch (position) {
+                    case 0: // movie fragment
+                        mPresenter.loadListData(true);
+                        break;
+                    case 1: // tv show fragment
+                        mPresenter.loadListData(false);
+                        break;
+                }
+            }
+        });
     }
 
     @Override
@@ -86,25 +95,29 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Item
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        if (s.length() >= 3) {
-            if (mPager.getCurrentItem() == 0) {
-                mPresenter.loadListSearch(mSearchBar.getText(), true);
-            } else {
-                mPresenter.loadListSearch(mSearchBar.getText(), false);
-            }
-        } else {
-            mCustomSuggestionsAdapter.setSuggestions(mSourceTopList.subList(0, 10));
+        if (timer != null) {
+            timer.cancel();
         }
     }
 
     @Override
-    public void afterTextChanged(Editable s) {
+    public void afterTextChanged(final Editable s) {
 
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (s.length() < 3) {
+                    mPresenter.loadListData(mPager.getCurrentItem() == 0);
+                } else {
+                    mPresenter.loadListSearch(mSearchBar.getText(), mPager.getCurrentItem() == 0);
+                }
+            }
+        }, 200);
     }
 
     @Override
-    public void ItemClickListener(int programId) { // TV shows or Movie ID
+    public void onItemClickListener(int programId) { // TV shows or Movie ID
 
         Intent intentDetailActivity = new Intent(MainActivity.this, DetailActivity.class);
 
@@ -116,12 +129,12 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Item
     }
 
     @Override
-    public void showSearchResult(ListWrapper<TvMovieVm> movies) {
+    public void showSearchResult(List<TvMovieVm> movies) {
 
         List<SuggestionVm> helperList = new ArrayList<>();
 
         // update data for suggestions in search
-        for (TvMovieVm item : movies.Results) {
+        for (TvMovieVm item : movies) {
             helperList.add(new SuggestionVm(item.BackdropPath, item.Title, item.Id));
         }
 
@@ -130,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, Item
 
     @Override
     public void showSearchResultEmpty() {
-        mCustomSuggestionsAdapter.clearSuggestions();
+        mCustomSuggestionsAdapter.setSuggestions(new ArrayList<SuggestionVm>());
     }
 
     @Override

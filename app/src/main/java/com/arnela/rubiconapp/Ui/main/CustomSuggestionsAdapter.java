@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
-public class CustomSuggestionsAdapter  extends SuggestionsAdapter<SuggestionVm, SuggestionHolder> {
+public class CustomSuggestionsAdapter extends SuggestionsAdapter<SuggestionVm, SuggestionHolder> {
 
     private ItemClickListener mListener;
 
@@ -39,6 +39,10 @@ public class CustomSuggestionsAdapter  extends SuggestionsAdapter<SuggestionVm, 
 
     @Override
     public void onBindSuggestionHolder(SuggestionVm suggestion, SuggestionHolder holder, int position) {
+
+        holder.image.setVisibility(View.VISIBLE);
+        holder.title.setVisibility(View.VISIBLE);
+
         holder.ItemId = suggestion.getId();
         holder.title.setText(suggestion.getTitle());
 
@@ -46,6 +50,7 @@ public class CustomSuggestionsAdapter  extends SuggestionsAdapter<SuggestionVm, 
                 .placeholder(R.drawable.img_placeholder)
                 .transform(new CropCircleTransformation())
                 .into(holder.image);
+
     }
 
     /**
@@ -53,7 +58,7 @@ public class CustomSuggestionsAdapter  extends SuggestionsAdapter<SuggestionVm, 
      * <p>Returns a filter that can be used to constrain data with a filtering
      * pattern.</p>
      * <p>
-     * <p>This method is usually implemented by {@link RecyclerView.Adapter}
+     * <p>This method is usually implemented by {RecyclerView.Adapter}
      * classes.</p>
      *
      * @return a filter used to constrain data

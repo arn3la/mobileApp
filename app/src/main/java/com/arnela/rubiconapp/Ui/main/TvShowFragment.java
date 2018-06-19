@@ -12,15 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.arnela.rubiconapp.Data.DataManager;
-import com.arnela.rubiconapp.Data.DataModels.SuggestionVm;
 import com.arnela.rubiconapp.Data.DataModels.TvMovieVm;
 import com.arnela.rubiconapp.Data.Helper.ItemClickListener;
-import com.arnela.rubiconapp.Data.Helper.ListWrapper;
 import com.arnela.rubiconapp.R;
 import com.arnela.rubiconapp.Ui.detail.DetailActivity;
 import com.arnela.rubiconapp.Util.DialogFactory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,7 +28,6 @@ public class TvShowFragment extends Fragment implements MainMvpView, ItemClickLi
 
     private MainFragmentPresenter mMainFragmentPresenter;
     private TvMovieListAdapter mMovieAdapter;
-    private List<SuggestionVm> mListSource = new ArrayList<>();
 
     @BindView(R.id.rv_movies)
     RecyclerView mRVMovies;
@@ -68,29 +64,21 @@ public class TvShowFragment extends Fragment implements MainMvpView, ItemClickLi
     }
 
     @Override
-    public void showTvMovieList(ListWrapper<TvMovieVm> response) {
+    public void showTvMovieList(List<TvMovieVm> response) {
 
-        mMovieAdapter.setSource(response.Results.subList(0, 10));
+        int limit = response.size() > 10 ? 10 : response.size();
+        mMovieAdapter.setSource(response.subList(0, limit));
         mMovieAdapter.notifyDataSetChanged();
 
-        for (TvMovieVm item : response.Results) {
-            mListSource.add(new SuggestionVm(item.BackdropPath, item.Title, item.Id));
-        }
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && getActivity() != null) {
-            ((MainActivity) getActivity()).updateData(mListSource);
-        }
     }
 
     @Override
     public void showTvMovieListEmpty() {
+
         mMovieAdapter.setSource(Collections.<TvMovieVm>emptyList());
         mMovieAdapter.notifyDataSetChanged();
         Toast.makeText(getActivity(), R.string.empty_list_show, Toast.LENGTH_LONG).show();
+
     }
 
     @Override
@@ -100,7 +88,7 @@ public class TvShowFragment extends Fragment implements MainMvpView, ItemClickLi
     }
 
     @Override
-    public void ItemClickListener(int position) {
+    public void onItemClickListener(int position) {
 
         Intent intentDetailActivity = new Intent(getActivity(), DetailActivity.class);
         intentDetailActivity.putExtra("tv_show_id", position);

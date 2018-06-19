@@ -19,7 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:mt_hint="@string/search_hint"
-            app:mt_maxSuggestionsCount="10"
             app:mt_placeholder="@string/app_name"
             app:mt_textColor="@color/colorAccent"
             app:mt_placeholderColor="@color/colorAccent"

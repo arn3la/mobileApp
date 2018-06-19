@@ -13,15 +13,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.arnela.rubiconapp.Data.DataManager;
-import com.arnela.rubiconapp.Data.DataModels.SuggestionVm;
 import com.arnela.rubiconapp.Data.DataModels.TvMovieVm;
 import com.arnela.rubiconapp.Data.Helper.ItemClickListener;
-import com.arnela.rubiconapp.Data.Helper.ListWrapper;
 import com.arnela.rubiconapp.R;
 import com.arnela.rubiconapp.Ui.detail.DetailActivity;
 import com.arnela.rubiconapp.Util.DialogFactory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +29,6 @@ public class MoviesFragment extends Fragment implements MainMvpView, ItemClickLi
 
     private MainFragmentPresenter mMainFragmentPresenter;
     private TvMovieListAdapter mMovieAdapter;
-    private List<SuggestionVm> mListSource = new ArrayList<>();
 
     @BindView(R.id.rv_movies)
     RecyclerView mRVMovies;
@@ -72,28 +68,12 @@ public class MoviesFragment extends Fragment implements MainMvpView, ItemClickLi
     }
 
     @Override
-    public void showTvMovieList(ListWrapper<TvMovieVm> response) {
+    public void showTvMovieList(List<TvMovieVm> response) {
 
-        mMovieAdapter.setSource(response.Results.subList(0, 10));
+        int limit = response.size() > 10 ? 10 : response.size();
+        mMovieAdapter.setSource(response.subList(0, limit));
         mMovieAdapter.notifyDataSetChanged();
 
-        // update data for suggestions in search
-        for (TvMovieVm item : response.Results) {
-            mListSource.add(new SuggestionVm(item.BackdropPath, item.Title, item.Id));
-        }
-
-        // update suggestions on main activity
-        if (getActivity() != null && getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).updateData(mListSource);
-        }
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && getActivity() != null) {
-            ((MainActivity) getActivity()).updateData(mListSource);
-        }
     }
 
     @Override
@@ -102,6 +82,7 @@ public class MoviesFragment extends Fragment implements MainMvpView, ItemClickLi
         mMovieAdapter.setSource(Collections.<TvMovieVm>emptyList());
         mMovieAdapter.notifyDataSetChanged();
         Toast.makeText(getActivity(), R.string.empty_list_movies, Toast.LENGTH_LONG).show();
+
     }
 
     @Override
@@ -111,7 +92,7 @@ public class MoviesFragment extends Fragment implements MainMvpView, ItemClickLi
     }
 
     @Override
-    public void ItemClickListener(int movieId) {
+    public void onItemClickListener(int movieId) {
 
         Intent intentDetailActivity = new Intent(getActivity(), DetailActivity.class);
         intentDetailActivity.putExtra("movie_id", movieId);

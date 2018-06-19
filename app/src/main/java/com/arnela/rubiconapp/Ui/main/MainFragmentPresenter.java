@@ -7,8 +7,6 @@ import com.arnela.rubiconapp.Data.Helper.ListWrapper;
 import com.arnela.rubiconapp.Ui.base.BasePresenter;
 import com.arnela.rubiconapp.Util.RxUtil;
 
-import java.util.ArrayList;
-
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -58,7 +56,7 @@ public class MainFragmentPresenter extends BasePresenter<MainMvpView> {
                             getMvpView().showTvMovieListEmpty();
                         } else {
                             if (movies.Results.get(0) != null) {
-                                getMvpView().showTvMovieList(movies);
+                                getMvpView().showTvMovieList(movies.Results);
                             }
                         }
                     }

@@ -36,6 +36,11 @@ public class TvMovieListAdapter extends RecyclerView.Adapter<TvMovieListAdapter.
         mMovieList = movies;
     }
 
+    public List<TvMovieVm> getSource() {
+        return mMovieList;
+    }
+
+
     @NonNull
     @Override
     public TvMovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -86,7 +91,7 @@ public class TvMovieListAdapter extends RecyclerView.Adapter<TvMovieListAdapter.
 
         @Override
         public void onClick(View v) {
-            mListener.ItemClickListener(MovieId);
+            mListener.onItemClickListener(MovieId);
         }
     }
 

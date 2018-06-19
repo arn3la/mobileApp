@@ -4,19 +4,18 @@
 
     <!-- Dialog -->
     <string name="dialog_action_ok">OK</string>
-    <string name="dialog_action_cancel">Cancel</string>
     <string name="dialog_error_title">Sorry</string>
 
     <!-- Errors -->
-    <string name="empty_list_movies">There aren\'t any movies</string>
+    <string name="empty_list_movies">There are not any movies</string>
     <string name="error_loading_list_movies">There was a problem loading the movies</string>
-    <string name="empty_list_show">There aren\'t any tv shows</string>
+    <string name="empty_list_show">There are not any tv shows</string>
     <string name="error_loading_list_show">There was a problem loading the tv shows</string>
     <string name="error_loading">There was a problem loading a data</string>
 
     <!-- Layouts -->
     <string name="img_description">Movie/tv show image.</string>
-    <string name="empty_placeholder"></string>
+    <string name="empty_placeholder"/>
     <string name="search_hint">Search</string>
 
     <!-- MAIN ACTIVITY -->

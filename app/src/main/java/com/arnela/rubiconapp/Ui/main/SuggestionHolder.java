@@ -23,7 +23,7 @@ public class SuggestionHolder extends RecyclerView.ViewHolder implements View.On
     public SuggestionHolder(View itemView, ItemClickListener listener) {
         super(itemView);
 
-        title =  itemView.findViewById(R.id.txt_title_item);
+        title = itemView.findViewById(R.id.txt_title_item);
         image = itemView.findViewById(R.id.img_movie_pic);
 
         itemView.setOnClickListener(this);
@@ -31,17 +31,9 @@ public class SuggestionHolder extends RecyclerView.ViewHolder implements View.On
         mListener = listener;
     }
 
-    public TextView getTitle() {
-        return title;
-    }
-
-    public ImageView getImage() {
-        return image;
-    }
-
     @Override
     public void onClick(View v) {
-        mListener.ItemClickListener(ItemId);
+        mListener.onItemClickListener(ItemId);
     }
 
 }
